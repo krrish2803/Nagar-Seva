@@ -74,7 +74,37 @@ export default function RoutingPage() {
     }
 
     try {
-      setUser(JSON.parse(storedUser))
+      const parsedUser = JSON.parse(storedUser) as StoredUser
+      setUser(parsedUser)
+
+      if (parsedUser.userId) {
+        setIsLoading(true)
+        setError('')
+
+        fetch(`/api/complaints/citizen/${parsedUser.userId}/dashboard?limit=25`, {
+          cache: 'no-store',
+        })
+          .then(async (response) => {
+            const data = await response.json()
+
+            if (!response.ok) {
+              throw new Error(data.detail || 'Unable to load routing assignments')
+            }
+
+            setDashboard(data)
+          })
+          .catch((loadError) => {
+            setDashboard({ reports: [] })
+            setError(
+              loadError instanceof Error
+                ? loadError.message
+                : 'Unable to load routing assignments'
+            )
+          })
+          .finally(() => {
+            setIsLoading(false)
+          })
+      }
     } catch {
       localStorage.removeItem('nagarseva_token')
       localStorage.removeItem('nagarseva_user')
@@ -84,38 +114,6 @@ export default function RoutingPage() {
 
     setIsCheckingSession(false)
   }, [router])
-
-  useEffect(() => {
-    if (!user?.userId) {
-      return
-    }
-
-    async function loadReports() {
-      setIsLoading(true)
-      setError('')
-
-      try {
-        const response = await fetch(
-          `/api/complaints/citizen/${user?.userId}/dashboard?limit=25`,
-          { cache: 'no-store' }
-        )
-        const data = await response.json()
-
-        if (!response.ok) {
-          throw new Error(data.detail || 'Unable to load routing assignments')
-        }
-
-        setDashboard(data)
-      } catch (loadError) {
-        setDashboard({ reports: [] })
-        setError(loadError instanceof Error ? loadError.message : 'Unable to load routing assignments')
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    loadReports()
-  }, [user?.userId])
 
   const reports = useMemo(() => dashboard?.reports || [], [dashboard])
 

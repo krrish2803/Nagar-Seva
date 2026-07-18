@@ -85,7 +85,49 @@ export default function EscalationPage() {
     }
 
     try {
-      setUser(JSON.parse(storedUser))
+      const parsedUser = JSON.parse(storedUser) as StoredUser
+      setUser(parsedUser)
+
+      if (parsedUser.userId) {
+        setIsLoading(true)
+        setError('')
+
+        Promise.all([
+          fetch(`/api/complaints/citizen/${parsedUser.userId}/dashboard?limit=25`, {
+            cache: 'no-store',
+          }),
+          fetch('/api/escalation/pending-count', { cache: 'no-store' }),
+          fetch('/api/escalation/analytics/escalation-rate?days_lookback=30', {
+            cache: 'no-store',
+          }),
+        ])
+          .then(async ([dashboardResponse, pendingResponse, rateResponse]) => {
+            const dashboardData = await dashboardResponse.json()
+            const pendingData = await pendingResponse.json()
+            const rateData = await rateResponse.json()
+
+            if (!dashboardResponse.ok) {
+              throw new Error(dashboardData.detail || 'Unable to load dashboard reports')
+            }
+
+            setDashboard(dashboardData)
+            setPendingCount(pendingResponse.ok ? pendingData : {})
+            setEscalationRate(rateResponse.ok ? rateData : {})
+          })
+          .catch((loadError) => {
+            setDashboard({ reports: [] })
+            setPendingCount({})
+            setEscalationRate({})
+            setError(
+              loadError instanceof Error
+                ? loadError.message
+                : 'Unable to load escalation data'
+            )
+          })
+          .finally(() => {
+            setIsLoading(false)
+          })
+      }
     } catch {
       localStorage.removeItem('nagarseva_token')
       localStorage.removeItem('nagarseva_user')
@@ -95,46 +137,6 @@ export default function EscalationPage() {
 
     setIsCheckingSession(false)
   }, [router])
-
-  useEffect(() => {
-    if (!user?.userId) {
-      return
-    }
-
-    async function loadEscalationData() {
-      setIsLoading(true)
-      setError('')
-
-      try {
-        const [dashboardResponse, pendingResponse, rateResponse] = await Promise.all([
-          fetch(`/api/complaints/citizen/${user?.userId}/dashboard?limit=25`, { cache: 'no-store' }),
-          fetch('/api/escalation/pending-count', { cache: 'no-store' }),
-          fetch('/api/escalation/analytics/escalation-rate?days_lookback=30', { cache: 'no-store' }),
-        ])
-
-        const dashboardData = await dashboardResponse.json()
-        const pendingData = await pendingResponse.json()
-        const rateData = await rateResponse.json()
-
-        if (!dashboardResponse.ok) {
-          throw new Error(dashboardData.detail || 'Unable to load dashboard reports')
-        }
-
-        setDashboard(dashboardData)
-        setPendingCount(pendingResponse.ok ? pendingData : {})
-        setEscalationRate(rateResponse.ok ? rateData : {})
-      } catch (loadError) {
-        setDashboard({ reports: [] })
-        setPendingCount({})
-        setEscalationRate({})
-        setError(loadError instanceof Error ? loadError.message : 'Unable to load escalation data')
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    loadEscalationData()
-  }, [user?.userId])
 
   const escalatedReports = useMemo(
     () =>

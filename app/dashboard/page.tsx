@@ -162,7 +162,11 @@ export default function DashboardPage() {
     }
 
     try {
-      setUser(JSON.parse(storedUser))
+      const parsedUser = JSON.parse(storedUser) as StoredUser
+      setUser(parsedUser)
+      if (parsedUser.userId) {
+        loadDashboard(parsedUser.userId)
+      }
     } catch {
       localStorage.removeItem('nagarseva_token')
       localStorage.removeItem('nagarseva_user')
@@ -203,12 +207,6 @@ export default function DashboardPage() {
       setIsLoadingReports(false)
     }
   }
-
-  useEffect(() => {
-    if (user?.userId) {
-      loadDashboard(user.userId)
-    }
-  }, [user?.userId])
 
   const latestReport = useMemo(() => dashboard?.reports?.[0], [dashboard])
 
