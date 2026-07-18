@@ -40,6 +40,7 @@ Set these in **Render Dashboard > Service > Environment**:
 | `NVIDIA_MODEL_TEXT` | `meta/llama-3.1-70b-instruct` |
 | `UPLOAD_DIR` | `/tmp/nagarseva-uploads` |
 | `CORS_ORIGINS` | Your frontend URL, plus local dev URLs if needed |
+| `CORS_ORIGIN_REGEX` | `https://([a-z0-9]+--)?nagar-seva\.netlify\.app` |
 
 Example `CORS_ORIGINS`:
 

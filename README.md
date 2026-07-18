@@ -210,6 +210,12 @@ If the frontend is deployed on Netlify, include the Netlify URL in Render `CORS_
 https://your-site.netlify.app,https://your-deploy-preview.netlify.app,http://localhost:3000,http://localhost:3001
 ```
 
+The backend also supports Netlify deploy previews through `CORS_ORIGIN_REGEX`:
+
+```text
+https://([a-z0-9]+--)?nagar-seva\.netlify\.app
+```
+
 Read the full deployment guide:
 
 ```text

@@ -69,6 +69,7 @@ class Settings(BaseSettings):
 
     # CORS
     cors_origins: str = "http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000"
+    cors_origin_regex: str = r"https://([a-z0-9]+--)?nagar-seva\.netlify\.app"
 
     class Config:
         """Pydantic config."""
