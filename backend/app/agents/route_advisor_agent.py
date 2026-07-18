@@ -11,7 +11,6 @@ from app.utils.geospatial import (
     create_bounding_box,
     get_points_within_radius,
 )
-from app.utils.nvidia_nim import generate_route_safety_analysis
 from app.utils.database import get_database, normalize_mongo_document
 
 
@@ -194,12 +193,21 @@ async def calculate_segment_risk(
         Risk score (0-1)
     """
     try:
-        # Get analysis from NVIDIA LLM
-        analysis = await generate_route_safety_analysis(
-            segment_data, time_of_day
+        incident_count = segment_data.get("incident_count", 0)
+        nearby_clusters = segment_data.get("nearby_clusters", [])
+        highest_nearby_risk = max(
+            [point.get("risk_score", 0.45) for point in nearby_clusters],
+            default=0.15,
         )
+        time_multiplier = {
+            "morning": 0.9,
+            "afternoon": 1.0,
+            "evening": 1.15,
+            "night": 1.35,
+        }.get(time_of_day, 1.0)
 
-        risk_score = analysis.get("risk_score", 0.5)
+        density_risk = min(0.35, incident_count * 0.08)
+        risk_score = min(1.0, (highest_nearby_risk + density_risk) * time_multiplier)
         print(f"[ROUTE] Calculated segment risk: {risk_score:.2f}")
         return risk_score
     except Exception as e:

@@ -30,6 +30,7 @@ requests>=2.31.0
 # Security & Authentication
 python-jose[cryptography]>=3.3.0
 passlib[bcrypt]>=1.7.4
+bcrypt==4.0.1
 
 # Configuration & Env
 python-dotenv>=1.0.0
