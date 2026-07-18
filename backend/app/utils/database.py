@@ -11,7 +11,7 @@ from pymongo import ASCENDING, DESCENDING, GEOSPHERE
 from app.config import settings
 
 logger = logging.getLogger(__name__)
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["pbkdf2_sha256", "bcrypt"], deprecated="auto")
 
 _mongo_client: Optional[AsyncIOMotorClient] = None
 

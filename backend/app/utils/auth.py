@@ -16,7 +16,7 @@ from app.utils.notifications import send_sms
 logger = logging.getLogger(__name__)
 
 security = HTTPBearer()
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["pbkdf2_sha256", "bcrypt"], deprecated="auto")
 
 
 class TokenPayload(BaseModel):
