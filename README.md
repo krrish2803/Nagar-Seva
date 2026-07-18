@@ -109,7 +109,10 @@ Create `.env.local` for frontend if the backend is not running on the default UR
 
 ```env
 BACKEND_API_BASE_URL=http://localhost:8001
+NEXT_PUBLIC_BACKEND_API_BASE_URL=http://localhost:8001
 ```
+
+For Netlify, set `NEXT_PUBLIC_BACKEND_API_BASE_URL` to the deployed Render backend URL so long-running upload requests go directly to FastAPI instead of timing out inside a Netlify function.
 
 > Never commit real `.env` files or API keys.
 
@@ -200,6 +203,12 @@ Required Render settings:
 - **Build Command:** `pip install --upgrade pip && pip install -r requirements.txt`
 - **Start Command:** `python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 - **Health Check Path:** `/health`
+
+If the frontend is deployed on Netlify, include the Netlify URL in Render `CORS_ORIGINS`, for example:
+
+```text
+https://your-site.netlify.app,https://your-deploy-preview.netlify.app,http://localhost:3000,http://localhost:3001
+```
 
 Read the full deployment guide:
 

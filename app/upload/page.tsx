@@ -24,6 +24,22 @@ type ReportFormState = {
   longitude: string
 }
 
+const FALLBACK_RENDER_BACKEND_URL = 'https://nagar-seva-q2oe.onrender.com'
+
+function getComplaintReportUrl() {
+  const configuredBackendUrl = process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL
+
+  if (configuredBackendUrl) {
+    return `${configuredBackendUrl.replace(/\/$/, '')}/api/complaints/report`
+  }
+
+  if (typeof window !== 'undefined' && window.location.hostname.endsWith('netlify.app')) {
+    return `${FALLBACK_RENDER_BACKEND_URL}/api/complaints/report`
+  }
+
+  return '/api/complaints/report'
+}
+
 export default function UploadPage() {
   const router = useRouter()
   const [user, setUser] = useState<StoredUser | null>(null)
@@ -104,7 +120,7 @@ export default function UploadPage() {
     }
 
     try {
-      const response = await fetch('/api/complaints/report', {
+      const response = await fetch(getComplaintReportUrl(), {
         method: 'POST',
         body: formData,
       })
