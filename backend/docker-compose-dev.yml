@@ -1,0 +1,134 @@
+"""Docker Compose configuration for local development."""
+
+version: "3.9"
+
+services:
+  # MongoDB for development
+  mongodb:
+    image: mongo:7.0-alpine
+    container_name: nagarseva_dev_mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: nagarseva_db
+    volumes:
+      - mongodb_dev_data:/data/db
+      - mongodb_dev_config:/data/configdb
+    networks:
+      - nagarseva_dev_network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: --serviceMaxWireProtocolVersion 17
+
+  # Redis for Celery task queue
+  redis:
+    image: redis:7-alpine
+    container_name: nagarseva_dev_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_dev_data:/data
+    networks:
+      - nagarseva_dev_network
+    healthcheck:
+      test: redis-cli ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: redis-server --appendonly yes
+
+  # FastAPI backend application
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nagarseva_dev_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=True
+      - MONGODB_URL=mongodb://mongodb:27017
+      - MONGODB_DATABASE=nagarseva_db
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - LOG_LEVEL=DEBUG
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./app:/app/app
+      - ./uploads:/app/uploads
+    networks:
+      - nagarseva_dev_network
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # Celery worker for async tasks
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nagarseva_dev_celery
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=True
+      - MONGODB_URL=mongodb://mongodb:27017
+      - MONGODB_DATABASE=nagarseva_db
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - LOG_LEVEL=DEBUG
+    depends_on:
+      - mongodb
+      - redis
+    volumes:
+      - ./app:/app/app
+      - ./uploads:/app/uploads
+    networks:
+      - nagarseva_dev_network
+    command: celery -A app.tasks.celery_tasks worker --loglevel=debug
+
+  # Redis Commander for debugging Redis
+  redis_commander:
+    image: rediscommander/redis-commander:latest
+    container_name: nagarseva_dev_redis_commander
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    networks:
+      - nagarseva_dev_network
+
+  # Mongo Express for MongoDB GUI (optional)
+  mongo_express:
+    image: mongo-express:latest
+    container_name: nagarseva_dev_mongo_express
+    ports:
+      - "8082:8081"
+    environment:
+      - ME_CONFIG_MONGODB_URL=mongodb://mongodb:27017
+      - ME_CONFIG_MONGODB_DATABASE=nagarseva_db
+    depends_on:
+      - mongodb
+    networks:
+      - nagarseva_dev_network
+
+volumes:
+  mongodb_dev_data:
+    driver: local
+  mongodb_dev_config:
+    driver: local
+  redis_dev_data:
+    driver: local
+
+networks:
+  nagarseva_dev_network:
+    driver: bridge

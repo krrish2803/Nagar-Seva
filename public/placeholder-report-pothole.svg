@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-label="Pothole complaint photo placeholder">
+  <rect width="640" height="420" fill="#dbeafe"/>
+  <path d="M0 230c120-42 207-42 330 0s212 40 310 0v190H0z" fill="#475569"/>
+  <path d="M0 300h640" stroke="#facc15" stroke-width="10" stroke-dasharray="50 34"/>
+  <ellipse cx="345" cy="260" rx="128" ry="54" fill="#111827"/>
+  <ellipse cx="350" cy="250" rx="92" ry="33" fill="#374151"/>
+  <path d="M246 242c-34 14-55 32-72 56M478 252c40 16 66 42 86 82M300 206c-38-28-74-45-122-54" stroke="#1f2937" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <circle cx="118" cy="126" r="36" fill="#22c55e"/>
+  <rect x="106" y="155" width="24" height="72" fill="#166534"/>
+  <circle cx="520" cy="112" r="28" fill="#22c55e"/>
+  <rect x="510" y="138" width="18" height="82" fill="#166534"/>
+</svg>

@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nagarseva-backend"
+version = "0.1.0"
+description = "NagarSeva Multi-Agent Backend for Civic Issue Management"
+requires-python = ">=3.10"
+authors = [
+    {name = "NagarSeva Team", email = "team@nagarseva.com"}
+]
+dependencies = [
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "motor>=3.3.2",
+    "pymongo>=4.6.0",
+    "celery>=5.3.4",
+    "redis>=5.0.0",
+    "numpy>=1.24.0",
+    "scikit-learn>=1.3.0",
+    "httpx>=0.25.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "email-validator>=2.1.0",
+    "python-multipart>=0.0.6",
+    "python-dotenv>=1.0.0",
+    "requests>=2.31.0",
+    "langchain>=0.0.340",
+    "langchain-openai>=0.0.5",
+    "python-jose[cryptography]>=3.3.0",
+    "passlib[bcrypt]>=1.7.4",
+    "geopy>=2.3.0",
+    "Pillow>=10.0.0",
+    "aiofiles>=23.2.0",
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.6.0",
+    "pytest-cov>=4.1.0",
+]
+
+[tool.setuptools]
+packages = ["app"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+select = ["E", "F", "W"]
+exclude = [".venv", ".git", "__pycache__"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_unused_ignores = true
