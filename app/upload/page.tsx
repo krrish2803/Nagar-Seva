@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import AppSidebar from '@/components/AppSidebar'
+import { apiUrl } from '@/lib/apiClient'
 import { generateIssuePdf } from '@/lib/reportPdf'
 import type { ChangeEvent, FormEvent } from 'react'
 import type { PdfReportData } from '@/lib/reportPdf'
@@ -22,22 +23,6 @@ type ReportFormState = {
   pin_code: string
   latitude: string
   longitude: string
-}
-
-const FALLBACK_RENDER_BACKEND_URL = 'https://nagar-seva-q2oe.onrender.com'
-
-function getComplaintReportUrl() {
-  const configuredBackendUrl = process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL
-
-  if (configuredBackendUrl) {
-    return `${configuredBackendUrl.replace(/\/$/, '')}/api/complaints/report`
-  }
-
-  if (typeof window !== 'undefined' && window.location.hostname.endsWith('netlify.app')) {
-    return `${FALLBACK_RENDER_BACKEND_URL}/api/complaints/report`
-  }
-
-  return '/api/complaints/report'
 }
 
 export default function UploadPage() {
@@ -120,7 +105,7 @@ export default function UploadPage() {
     }
 
     try {
-      const response = await fetch(getComplaintReportUrl(), {
+      const response = await fetch(apiUrl('/api/complaints/report'), {
         method: 'POST',
         body: formData,
       })

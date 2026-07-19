@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import AppSidebar from '@/components/AppSidebar'
+import { apiUrl } from '@/lib/apiClient'
 import { generateIssuePdf } from '@/lib/reportPdf'
 import type { PdfReportData } from '@/lib/reportPdf'
 
@@ -183,7 +184,7 @@ export default function DashboardPage() {
 
     try {
       const response = await fetch(
-        `/api/complaints/citizen/${citizenId}/dashboard?limit=25`,
+        apiUrl(`/api/complaints/citizen/${citizenId}/dashboard?limit=25`),
         { cache: 'no-store' }
       )
       const data = await response.json()

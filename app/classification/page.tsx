@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import AppSidebar from '@/components/AppSidebar'
+import { apiUrl } from '@/lib/apiClient'
 
 type StoredUser = {
   userId: string
@@ -71,7 +72,7 @@ export default function ClassificationPage() {
         setIsLoading(true)
         setError('')
 
-        fetch(`/api/complaints/citizen/${parsedUser.userId}/dashboard?limit=25`, {
+        fetch(apiUrl(`/api/complaints/citizen/${parsedUser.userId}/dashboard?limit=25`), {
           cache: 'no-store',
         })
           .then(async (response) => {

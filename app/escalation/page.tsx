@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import AppSidebar from '@/components/AppSidebar'
+import { apiUrl } from '@/lib/apiClient'
 
 type StoredUser = {
   userId: string
@@ -93,11 +94,11 @@ export default function EscalationPage() {
         setError('')
 
         Promise.all([
-          fetch(`/api/complaints/citizen/${parsedUser.userId}/dashboard?limit=25`, {
+          fetch(apiUrl(`/api/complaints/citizen/${parsedUser.userId}/dashboard?limit=25`), {
             cache: 'no-store',
           }),
-          fetch('/api/escalation/pending-count', { cache: 'no-store' }),
-          fetch('/api/escalation/analytics/escalation-rate?days_lookback=30', {
+          fetch(apiUrl('/api/escalation/pending-count'), { cache: 'no-store' }),
+          fetch(apiUrl('/api/escalation/analytics/escalation-rate?days_lookback=30'), {
             cache: 'no-store',
           }),
         ])

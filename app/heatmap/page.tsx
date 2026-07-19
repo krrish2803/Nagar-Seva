@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import AppSidebar from '@/components/AppSidebar'
+import { apiUrl } from '@/lib/apiClient'
 
 type StoredUser = {
   userId: string
@@ -103,10 +104,10 @@ export default function HeatmapPage() {
 
       try {
         const [riskResponse, typesResponse, timeResponse, heatmapResponse] = await Promise.all([
-          fetch('/api/heatmap/analytics/risk-distribution?days_lookback=30', { cache: 'no-store' }),
-          fetch('/api/heatmap/analytics/incident-types?days_lookback=30', { cache: 'no-store' }),
-          fetch('/api/heatmap/analytics/time-patterns?days_lookback=30', { cache: 'no-store' }),
-          fetch('/api/heatmap/data?days_lookback=30&eps_meters=500', { cache: 'no-store' }),
+          fetch(apiUrl('/api/heatmap/analytics/risk-distribution?days_lookback=30'), { cache: 'no-store' }),
+          fetch(apiUrl('/api/heatmap/analytics/incident-types?days_lookback=30'), { cache: 'no-store' }),
+          fetch(apiUrl('/api/heatmap/analytics/time-patterns?days_lookback=30'), { cache: 'no-store' }),
+          fetch(apiUrl('/api/heatmap/data?days_lookback=30&eps_meters=500'), { cache: 'no-store' }),
         ])
 
         const [riskData, typesData, timeData, mapData] = await Promise.all([
